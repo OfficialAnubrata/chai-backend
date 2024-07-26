@@ -5,6 +5,8 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 
 const healthcheck = asyncHandler(async (req, res) => {
     //TODO: build a healthcheck response that simply returns the OK status as json with a message
+    return res.status(201).json(new ApiResponse({message: "API is up and running", statusCode: 200})) 
+
 })
 
 export {

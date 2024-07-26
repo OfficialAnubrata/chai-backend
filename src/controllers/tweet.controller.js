@@ -1,29 +1,56 @@
-import mongoose, { isValidObjectId } from "mongoose"
-import {Tweet} from "../models/tweet.model.js"
-import {User} from "../models/user.model.js"
-import {ApiError} from "../utils/ApiError.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
-import {asyncHandler} from "../utils/asyncHandler.js"
+import mongoose, { isValidObjectId } from "mongoose";
+import { Tweet } from "../models/tweet.model.js";
+import { User } from "../models/user.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const createTweet = asyncHandler(async (req, res) => {
-    //TODO: create tweet
-})
+  //TODO: create tweet
+  try {
+    const { content } = req.body;
+    if (!content) {
+      throw new ApiError(400, "Content is required");
+    }
+    const userId = req.user._id;
+    if (!isValidObjectId(userId)) {
+      throw new ApiError(400, "Invalid user ID");
+    }
+    const tweet = new Tweet({
+      content,
+      owner: userId,
+    });
+    const createdTweet = await tweet.save();
+    return res
+      .status(200)
+      .json(new ApiResponse(201, createdTweet, "Tweet created"));
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
 
 const getUserTweets = asyncHandler(async (req, res) => {
-    // TODO: get user tweets
-})
+  // TODO: get user tweets
+  try {
+    const { userId } = req.params;
+    if (!isValidObjectId(userId)) {
+      throw new ApiError(400, "Invalid user ID");
+    }
+    const tweets = await Tweet.find({ owner: userId });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, tweets, "User tweets fetched"));
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
 
 const updateTweet = asyncHandler(async (req, res) => {
-    //TODO: update tweet
-})
+  //TODO: update tweet
+});
 
 const deleteTweet = asyncHandler(async (req, res) => {
-    //TODO: delete tweet
-})
+  //TODO: delete tweet
+});
 
-export {
-    createTweet,
-    getUserTweets,
-    updateTweet,
-    deleteTweet
-}
+export { createTweet, getUserTweets, updateTweet, deleteTweet };
